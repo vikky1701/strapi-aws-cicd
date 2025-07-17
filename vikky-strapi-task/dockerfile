@@ -1,0 +1,23 @@
+# Use a Node.js image with the same version you use locally
+FROM node:20
+
+# Create app directory
+WORKDIR /app
+
+# Copy package files
+COPY package*.json ./
+
+# Install dependencies
+RUN npm install
+
+# Copy the rest of your project
+COPY . .
+
+# Rebuild native modules (important for better-sqlite3)
+RUN npm rebuild better-sqlite3
+
+# Expose the default Strapi port
+EXPOSE 1337
+
+# Run in development mode
+CMD ["npm", "run", "develop"]
