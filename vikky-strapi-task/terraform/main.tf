@@ -19,7 +19,7 @@ variable "docker_image_tag" {
 
 # Security Group
 resource "aws_security_group" "strapi_sg" {
-  name_prefix = "strapi-sg-"
+  name_prefix = "strapi-sg-vivek"
   
   ingress {
     description = "SSH"
@@ -61,7 +61,7 @@ resource "aws_security_group" "strapi_sg" {
 resource "aws_instance" "strapi" {
   ami                    = "ami-0d1b5a8c13042c939" # Ubuntu 24.04 LTS (us-east-2)
   instance_type          = "t2.micro"
-  key_name              = "my-strapi-key" # CHANGE THIS to your .pem key name
+  key_name              = "vivek-key" # CHANGE THIS to your .pem key name
   vpc_security_group_ids = [aws_security_group.strapi_sg.id]
   
   # Fixed templatefile with all required variables
@@ -76,7 +76,7 @@ resource "aws_instance" "strapi" {
   monitoring = true
 
   tags = {
-    Name = "Strapi-Server"
+    Name = "vivek-strapi"
   }
 }
 
@@ -92,5 +92,5 @@ output "ec2_public_dns" {
 
 # Output SSH command
 output "ssh_command" {
-  value = "ssh -i my-strapi-key.pem ubuntu@${aws_instance.strapi.public_ip}"
+  value = "ssh -i vivek-key.pem ubuntu@${aws_instance.strapi.public_ip}"
 }
