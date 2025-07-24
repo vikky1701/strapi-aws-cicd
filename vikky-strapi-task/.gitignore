@@ -129,11 +129,10 @@ dist
 build
 .strapi-updater.json
 .strapi-cloud.json
-
+.terraform.lock.hcl
+terraform.tfstate
 .terraform
-.terraform.lock.hcl 
-*.tfstate
-*.tfstate.backup
-############################
-# Miscellaneous
-############################
+terraform.tfstate.backup
+
+elbv2 describe-target-groups --names strapi-tg-vivek
+terraform.tfstate.1753355468.backup
