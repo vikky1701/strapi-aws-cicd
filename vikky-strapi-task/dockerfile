@@ -1,23 +1,23 @@
-# Use a Node.js image with the same version you use locally
+# Use official Node.js image
 FROM node:20
 
-# Create app directory
+# Set working directory
 WORKDIR /app
 
 # Copy package files
 COPY package*.json ./
 
-# Install dependencies
-RUN npm install
+# Install app dependencies including pg (PostgreSQL driver)
+RUN npm install pg && npm install
 
-# Copy the rest of your project
+# Copy all project files
 COPY . .
 
-# Rebuild native modules (important for better-sqlite3)
-RUN npm rebuild better-sqlite3
+# Build the admin panel (for production)
+RUN npm run build
 
-# Expose the default Strapi port
+# Expose default Strapi port
 EXPOSE 1337
 
-# Run in development mode
-CMD ["npm", "run", "develop"]
+# Run Strapi in production mode
+CMD ["npm", "run", "start"]
