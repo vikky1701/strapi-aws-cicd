@@ -47,10 +47,13 @@ jobs:
           terraform_version: 1.6.6
 
       - name: ⚙️ Terraform Init
+        working-directory: ./terraform-strapi-on-ecs
         run: terraform init
 
       - name: 📋 Terraform Plan
+        working-directory: ./terraform-strapi-on-ecs
         run: terraform plan -var="ecr_image_url=${{ env.ECR_IMAGE }}"
 
       - name: 🚀 Terraform Apply
+        working-directory: ./terraform-strapi-on-ecs
         run: terraform apply -auto-approve -var="ecr_image_url=${{ env.ECR_IMAGE }}"
