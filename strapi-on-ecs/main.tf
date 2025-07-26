@@ -199,7 +199,7 @@ resource "aws_lb_listener" "strapi_listener" {
 # Create a custom DB parameter group for SSL
 resource "aws_db_parameter_group" "strapi_postgres_params" {
   family = "postgres15"
-  name   = "strapi-postgres-params-vivek-2"
+  name   = "strapi-postgres-params-vivek-3"
 
   parameter {
     name  = "rds.force_ssl"
@@ -213,7 +213,7 @@ resource "aws_db_parameter_group" "strapi_postgres_params" {
 
 # DB Subnet Group
 resource "aws_db_subnet_group" "strapi_db_subnet_group" {
-  name       = "strapi-db-subnet-group-vivek"
+  name       = "strapi-db-subnet-group-vivek-2"
   subnet_ids = [aws_subnet.private_subnet_1.id, aws_subnet.private_subnet_2.id]
 
   tags = {
@@ -251,7 +251,7 @@ resource "aws_db_instance" "strapi_postgres" {
 
 # CloudWatch Log Group
 resource "aws_cloudwatch_log_group" "strapi_logs" {
-  name              = "/ecs/strapi-task-vivek"
+  name              = "/ecs/strapi-task-vivek-2"
   retention_in_days = 7
 
   tags = {
