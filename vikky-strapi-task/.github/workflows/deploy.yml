@@ -6,9 +6,12 @@ on:
 
 env:
   AWS_REGION: us-east-2
-  ECR_REPO: vivek-strapi-ecr
+  ECR_REPO: strapi-app
   ECR_ACCOUNT: 607700977843
-
+  ECS_CLUSTER: strapi-cluster-vivek
+  ECS_SERVICE: strapi-service-vivek
+  TASK_FAMILY: strapi-task-vivek
+  
 jobs:
   deploy:
     runs-on: ubuntu-latest
