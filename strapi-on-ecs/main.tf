@@ -33,7 +33,7 @@ data "aws_availability_zones" "available" {
 # Create Private Subnets for RDS using different CIDR ranges
 resource "aws_subnet" "private_subnet_1" {
   vpc_id            = data.aws_vpc.default.id
-  cidr_block        = "172.31.200.0/24"  # Using higher range to avoid conflicts
+  cidr_block        = "172.31.210.0/24"  # Using higher range to avoid conflicts
   availability_zone = data.aws_availability_zones.available.names[0]
 
   tags = {
