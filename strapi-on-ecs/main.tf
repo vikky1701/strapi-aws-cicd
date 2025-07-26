@@ -30,10 +30,9 @@ data "aws_availability_zones" "available" {
   state = "available"
 }
 
-# Create Private Subnets for RDS using different CIDR ranges
 resource "aws_subnet" "private_subnet_1" {
   vpc_id            = data.aws_vpc.default.id
-  cidr_block        = "10.0.101.0/24"  # Using higher range to avoid conflicts
+  cidr_block        = "172.31.100.0/24"  # Safe unused block
   availability_zone = data.aws_availability_zones.available.names[0]
 
   tags = {
@@ -43,13 +42,14 @@ resource "aws_subnet" "private_subnet_1" {
 
 resource "aws_subnet" "private_subnet_2" {
   vpc_id            = data.aws_vpc.default.id
-  cidr_block        = "10.0.102.0/24"  # Using higher range to avoid conflicts
+  cidr_block        = "172.31.110.0/24"  # Another safe unused block
   availability_zone = data.aws_availability_zones.available.names[1]
 
   tags = {
     Name = "strapi-private-subnet-2-vivek"
   }
 }
+
 
 # Security Group for ALB
 resource "aws_security_group" "alb_sg" {
