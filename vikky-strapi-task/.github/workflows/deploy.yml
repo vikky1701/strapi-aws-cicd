@@ -3,7 +3,7 @@ name: Deploy Strapi to ECS
 on:
   push:
     branches: [main]
-  workflow_dispatch:  # Allow manual triggering for testing
+  workflow_dispatch: # Allow manual triggering for testing
 
 env:
   AWS_REGION: us-east-2
