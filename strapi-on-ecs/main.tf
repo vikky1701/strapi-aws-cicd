@@ -32,7 +32,7 @@ data "aws_availability_zones" "available" {
 
 resource "aws_subnet" "private_subnet_1" {
   vpc_id            = data.aws_vpc.default.id
-  cidr_block        = "172.31.10.0/24"  # Safe unused block
+  cidr_block        = "172.31.120.0/24"
   availability_zone = data.aws_availability_zones.available.names[0]
 
   tags = {
@@ -42,13 +42,14 @@ resource "aws_subnet" "private_subnet_1" {
 
 resource "aws_subnet" "private_subnet_2" {
   vpc_id            = data.aws_vpc.default.id
-  cidr_block        = "172.31.20.0/24"  # Another safe unused block
+  cidr_block        = "172.31.130.0/24"
   availability_zone = data.aws_availability_zones.available.names[1]
 
   tags = {
     Name = "strapi-private-subnet-2-vivek"
   }
 }
+
 
 
 # Security Group for ALB
@@ -161,7 +162,7 @@ resource "aws_lb" "strapi_alb" {
 
 # Target Group
 resource "aws_lb_target_group" "strapi_tg" {
-  name        = "strapi-tg-vivek-3"
+  name        = "strapi-tg-vivek-4"
   port        = 1337
   protocol    = "HTTP"
   vpc_id      = data.aws_vpc.default.id
@@ -180,7 +181,7 @@ resource "aws_lb_target_group" "strapi_tg" {
   }
 
   tags = {
-    Name = "strapi-tg-vivek"
+    Name = "strapi-tg-vivek-4"
   }
 }
 
