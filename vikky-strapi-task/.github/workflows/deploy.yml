@@ -1,59 +1,56 @@
-name: CI/CD - Strapi ECS Fargate Deploy
+name: Deploy Strapi to ECS
 
 on:
   push:
-    branches:
-      - main  # ✅ OR change to `vivek` if that's your branch
+    branches: [main]
 
 env:
   AWS_REGION: us-east-2
-  ECR_REPO_NAME: strapi-ecr-vivek
-  ECS_CLUSTER_NAME: strapi-cluster-vivek
-  ECS_SERVICE_NAME: strapi-service-vivek
-  TASK_FAMILY: strapi-task-vivek
+  ECR_REPO: vivek-strapi-ecr
+  ECR_ACCOUNT: 607700977843
 
 jobs:
   deploy:
-    name: Build, Push Image & Deploy to ECS via Terraform
     runs-on: ubuntu-latest
 
     steps:
-      - name: 📥 Checkout Repo
-        uses: actions/checkout@v3
+    - name: 📥 Checkout Code
+      uses: actions/checkout@v4
 
-      - name: 🔐 Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v2
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ env.AWS_REGION }}
+    - name: 🔐 Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ env.AWS_REGION }}
 
-      - name: 🐳 Login to Amazon ECR
-        id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v1
+    - name: 📦 Ensure ECR Repo Exists
+      run: |
+        aws ecr describe-repositories --repository-names $ECR_REPO || \
+        aws ecr create-repository --repository-name $ECR_REPO
 
-      - name: 🛠️ Build and Push Docker Image
-        env:
-          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-        run: |
-          IMAGE_TAG=latest
-          docker build -t $ECR_REGISTRY/${{ env.ECR_REPO_NAME }}:$IMAGE_TAG .
-          docker push $ECR_REGISTRY/${{ env.ECR_REPO_NAME }}:$IMAGE_TAG
-          echo "ECR_IMAGE=$ECR_REGISTRY/${{ env.ECR_REPO_NAME }}:$IMAGE_TAG" >> $GITHUB_ENV
+    - name: 🔐 Login to Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v2
 
-      - name: 📦 Setup Terraform
-        uses: hashicorp/setup-terraform@v3
-        with:
-          terraform_version: 1.6.6
+    - name: 🛠️ Build & Push Docker Image to ECR
+      run: |
+        TIMESTAMP=$(date +%s)
+        IMAGE_TAG=vivek-strapi-$TIMESTAMP
+        ECR_URI=${{ env.ECR_ACCOUNT }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ env.ECR_REPO }}
+        docker build -t $ECR_URI:$IMAGE_TAG .
+        docker push $ECR_URI:$IMAGE_TAG
+        echo "image=$ECR_URI:$IMAGE_TAG" >> $GITHUB_ENV
 
-      - name: ⚙️ Terraform Init
-        working-directory: ./terraform-strapi-on-ecs
-        run: terraform init
+    - name: 🧰 Install Terraform
+      uses: hashicorp/setup-terraform@v3
+      with:
+        terraform_version: 1.6.6
 
-      - name: 📋 Terraform Plan
-        working-directory: ./terraform-strapi-on-ecs
-        run: terraform plan -var="ecr_image_url=${{ env.ECR_IMAGE }}"
+    - name: ⚙️ Terraform Init
+      working-directory: strapi-on-ecs
+      run: terraform init
 
-      - name: 🚀 Terraform Apply
-        working-directory: ./terraform-strapi-on-ecs
-        run: terraform apply -auto-approve -var="ecr_image_url=${{ env.ECR_IMAGE }}"
+    - name: 🚀 Terraform Apply
+      working-directory:  strapi-on-ecs
+      run: terraform apply -auto-approve -var="ecr_image_url=${{ env.image }}"
