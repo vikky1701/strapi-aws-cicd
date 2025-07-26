@@ -2,7 +2,7 @@ name: CI - Build and Push Docker Image
 
 on:
   push:
-    branches: [main, vivek]
+    branches: [ vivek]
 
 env:
   DOCKER_IMAGE: vikky17/strapi-app
