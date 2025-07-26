@@ -1,0 +1,78 @@
+name: Deploy Strapi to ECS
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch: # Allow manual triggering for testing
+
+env:
+  AWS_REGION: us-east-2
+  ECR_REPO: strapi-app
+  ECR_ACCOUNT: 607700977843
+  ECS_CLUSTER: strapi-cluster-vivek
+  ECS_SERVICE: strapi-service-vivek
+  TASK_FAMILY: strapi-task-vivek
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 📥 Checkout Code
+        uses: actions/checkout@v4
+
+      - name: 🔐 Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: 📦 Ensure ECR Repo Exists
+        run: |
+          aws ecr describe-repositories --repository-names $ECR_REPO || \
+          aws ecr create-repository --repository-name $ECR_REPO
+
+      - name: 🔐 Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: 🛠️ Build & Push Docker Image to ECR
+        run: |
+          TIMESTAMP=$(date +%s)
+          IMAGE_TAG=vivek-strapi-$TIMESTAMP
+          ECR_URI=${{ env.ECR_ACCOUNT }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ env.ECR_REPO }}
+          
+          # Build and push image
+          docker build -t $ECR_URI:$IMAGE_TAG .
+          docker push $ECR_URI:$IMAGE_TAG
+          
+          # Also tag as latest
+          docker tag $ECR_URI:$IMAGE_TAG $ECR_URI:latest
+          docker push $ECR_URI:latest
+          
+          # Set environment variable for terraform
+          echo "image=$ECR_URI:$IMAGE_TAG" >> $GITHUB_ENV
+
+      - name: 🧰 Install Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.6.6
+
+      - name: ⚙️ Terraform Init
+        working-directory: strapi-on-ecs
+        run: terraform init
+
+      - name: 📋 Terraform Plan
+        working-directory: strapi-on-ecs
+        run: |
+          terraform plan \
+            -var="ecr_image_url=${{ env.image }}" \
+            -var="db_password=${{ secrets.DB_PASSWORD }}"
+
+      - name: 🚀 Terraform Apply
+        working-directory: strapi-on-ecs
+        run: |
+          terraform apply -auto-approve \
+            -var="ecr_image_url=${{ env.image }}" \
+            -var="db_password=${{ secrets.DB_PASSWORD }}"
