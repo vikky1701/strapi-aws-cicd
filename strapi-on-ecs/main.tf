@@ -33,7 +33,7 @@ data "aws_availability_zones" "available" {
 # Create Private Subnets for RDS using different CIDR ranges
 resource "aws_subnet" "private_subnet_1" {
   vpc_id            = data.aws_vpc.default.id
-  cidr_block        = "172.31.230.0/24"  # Using higher range to avoid conflicts
+  cidr_block        = "172.31.240.0/24"  # Using higher range to avoid conflicts
   availability_zone = data.aws_availability_zones.available.names[0]
 
   tags = {
@@ -43,7 +43,7 @@ resource "aws_subnet" "private_subnet_1" {
 
 resource "aws_subnet" "private_subnet_2" {
   vpc_id            = data.aws_vpc.default.id
-  cidr_block        = "172.31.231.0/24"  # Using higher range to avoid conflicts
+  cidr_block        = "172.31.241.0/24"  # Using higher range to avoid conflicts
   availability_zone = data.aws_availability_zones.available.names[1]
 
   tags = {
@@ -53,7 +53,7 @@ resource "aws_subnet" "private_subnet_2" {
 
 # Security Group for ALB
 resource "aws_security_group" "alb_sg" {
-  name        = "strapi-alb-sg-vivek-2"
+  name        = "strapi-alb-sg-vivek-3"
   description = "Security group for Strapi ALB"
   vpc_id      = data.aws_vpc.default.id
 
@@ -161,7 +161,7 @@ resource "aws_lb" "strapi_alb" {
 
 # Target Group
 resource "aws_lb_target_group" "strapi_tg" {
-  name        = "strapi-tg-vivek-2"
+  name        = "strapi-tg-vivek-3"
   port        = 1337
   protocol    = "HTTP"
   vpc_id      = data.aws_vpc.default.id
@@ -199,7 +199,7 @@ resource "aws_lb_listener" "strapi_listener" {
 # Create a custom DB parameter group for SSL
 resource "aws_db_parameter_group" "strapi_postgres_params" {
   family = "postgres15"
-  name   = "strapi-postgres-params-vivek-3"
+  name   = "strapi-postgres-params-vivek-4"
 
   parameter {
     name  = "rds.force_ssl"
@@ -207,7 +207,7 @@ resource "aws_db_parameter_group" "strapi_postgres_params" {
   }
 
   tags = {
-    Name = "strapi-postgres-params-vivek"
+    Name = "strapi-postgres-params-vivek-4"
   }
 }
 
@@ -217,7 +217,7 @@ resource "aws_db_subnet_group" "strapi_db_subnet_group" {
   subnet_ids = [aws_subnet.private_subnet_1.id, aws_subnet.private_subnet_2.id]
 
   tags = {
-    Name = "strapi-db-subnet-group-vivek"
+    Name = "strapi-db-subnet-group-vivek-2"
   }
 }
 
