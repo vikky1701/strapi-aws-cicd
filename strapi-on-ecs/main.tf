@@ -32,7 +32,7 @@ data "aws_availability_zones" "available" {
 
 resource "aws_subnet" "private_subnet_1" {
   vpc_id            = data.aws_vpc.default.id
-  cidr_block        = "172.31.120.0/24"
+  cidr_block        = "172.31.150.0/24"
   availability_zone = data.aws_availability_zones.available.names[0]
 
   tags = {
@@ -42,7 +42,7 @@ resource "aws_subnet" "private_subnet_1" {
 
 resource "aws_subnet" "private_subnet_2" {
   vpc_id            = data.aws_vpc.default.id
-  cidr_block        = "172.31.130.0/24"
+  cidr_block        = "172.31.180.0/24"
   availability_zone = data.aws_availability_zones.available.names[1]
 
   tags = {
