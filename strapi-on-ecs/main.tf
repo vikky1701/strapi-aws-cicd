@@ -181,7 +181,7 @@ resource "aws_lb_target_group" "strapi_tg" {
   }
 
   tags = {
-    Name = "strapi-tg-vivek-4"
+    Name = "strapi-tg-vivek-5"
   }
 }
 
